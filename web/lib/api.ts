@@ -9,8 +9,23 @@ import {
 
 const API_BASE = ''; // Uses Next.js proxy rewrites
 
+async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 2): Promise<Response> {
+  let attempt = 0;
+  while (attempt <= retries) {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok || attempt === retries) return res;
+    } catch (err) {
+      if (attempt === retries) throw err;
+    }
+    attempt++;
+    await new Promise((resolve) => setTimeout(resolve, 300 * attempt));
+  }
+  return fetch(url, options);
+}
+
 export async function fetchPhotos(limit = 100, offset = 0): Promise<{ photos: PhotoItem[]; total: number }> {
-  const res = await fetch(`${API_BASE}/api/photos?limit=${limit}&offset=${offset}`, { cache: 'no-store' });
+  const res = await fetchWithRetry(`${API_BASE}/api/photos?limit=${limit}&offset=${offset}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to fetch photos');
   return res.json();
 }
