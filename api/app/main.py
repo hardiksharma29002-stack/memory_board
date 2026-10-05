@@ -24,6 +24,11 @@ async def lifespan(app: FastAPI):
     PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
     THUMBS_DIR.mkdir(parents=True, exist_ok=True)
     init_db()
+    try:
+        from .ingest.pipeline import sync_unindexed_photos
+        sync_unindexed_photos(verbose=False)
+    except Exception:
+        pass
     yield
     # Shutdown logic if needed
 
