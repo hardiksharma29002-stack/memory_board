@@ -55,8 +55,15 @@ class TelemetryLogger {
   }
 }
 
-export const telemetry = new TelemetryLogger();
-
 export function trackEvent(name: string, payload: Record<string, unknown> = {}, sessionId?: string) {
   telemetry.track(name, payload, sessionId);
 }
+
+export function trackQuestionAnswered(questionId: string, optionId: string, sessionId?: string) {
+  trackEvent('question_answered', { question_id: questionId, option_id: optionId }, sessionId);
+}
+
+export function trackNudgeStageChange(stage: string, durationMs?: number) {
+  trackEvent('nudge_stage_changed', { stage, duration_ms: durationMs });
+}
+
