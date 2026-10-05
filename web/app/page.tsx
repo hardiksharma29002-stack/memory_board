@@ -76,6 +76,21 @@ export default function MemoryBoardApp() {
   const [cognitiveCards, setCognitiveCards] = useState<CognitiveCardItem[]>([]);
   const [groups, setGroups] = useState<GroupCardItem[]>([]);
   const [clues, setClues] = useState<ClueItem[]>([]);
+  const updateClues = (newClues: ClueItem[]) => {
+    const seen = new Set<string>();
+    const deduped: ClueItem[] = [];
+    for (const c of newClues || []) {
+      const valKey = (c.value || '').trim().toLowerCase();
+      const lblKey = (c.label || '').trim().toLowerCase();
+      if ((valKey && seen.has(valKey)) || (lblKey && seen.has(lblKey))) {
+        continue;
+      }
+      if (valKey) seen.add(valKey);
+      if (lblKey) seen.add(lblKey);
+      deduped.push(c);
+    }
+    setClues(deduped);
+  };
   const [activeQuestion, setActiveQuestion] = useState<QuestionItem | null>(null);
   const [questionProgress, setQuestionProgress] = useState({ current: 1, total: 3 });
 
@@ -134,7 +149,7 @@ export default function MemoryBoardApp() {
     try {
       const res = await skipToAlbums(currentSessionId);
       setCurrentStep('groups');
-      setClues(res.clues);
+      updateClues(res.clues);
       setGroups(res.groups || []);
     } catch (err) {
       console.error('Error skipping to albums:', err);
@@ -240,7 +255,7 @@ export default function MemoryBoardApp() {
       setCurrentSessionId(res.session_id);
       setCards(res.cards || []);
       setCognitiveCards(res.cognitive_cards || []);
-      setClues(res.initial_clues || []);
+      updateClues(res.initial_clues || []);
 
       // Always present the 4 Big Square Cognitive Cards first to complete lost memory
       setCurrentStep('cue_board');
@@ -279,7 +294,7 @@ export default function MemoryBoardApp() {
     try {
       const res = await selectCues(currentSessionId, selectedCueIds);
       setCurrentStep('groups');
-      setClues(res.clues);
+      updateClues(res.clues);
       setGroups(res.groups || []);
     } catch (err) {
       console.error(err);
@@ -296,7 +311,7 @@ export default function MemoryBoardApp() {
     setIsActionLoading(true);
     try {
       const res = await addMemoryText(currentSessionId, text);
-      setClues(res.clues);
+      updateClues(res.clues);
       setGroups(res.groups || []);
       setCurrentStep('groups');
     } catch (err) {
@@ -312,7 +327,7 @@ export default function MemoryBoardApp() {
     try {
       const res = await submitSentence(currentSessionId, blanks);
       setCurrentStep('groups');
-      setClues(res.clues);
+      updateClues(res.clues);
       setGroups(res.groups || []);
     } catch (err) {
       console.error(err);
@@ -341,7 +356,7 @@ export default function MemoryBoardApp() {
     setIsActionLoading(true);
     try {
       const res = await answerQuestion(currentSessionId, questionId, optionId);
-      setClues(res.clues);
+      updateClues(res.clues);
       if (res.step === 'groups') {
         setCurrentStep('groups');
         setGroups(res.groups || []);
@@ -364,7 +379,7 @@ export default function MemoryBoardApp() {
     if (!currentSessionId) return;
     try {
       const res = await removeClue(currentSessionId, clueId);
-      setClues(res.clues);
+      updateClues(res.clues);
       if (currentStep === 'groups') {
         const remaining = res.clues.map((c) => c.value);
         if (remaining.length > 0) {
@@ -384,7 +399,7 @@ export default function MemoryBoardApp() {
     setIsActionLoading(true);
     try {
       const res = await rewindSession(currentSessionId);
-      setClues(res.clues);
+      updateClues(res.clues);
       if (res.step === 'cue_board') {
         setCurrentStep('cue_board');
       } else if (res.step === 'groups') {

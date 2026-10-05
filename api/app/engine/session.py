@@ -102,6 +102,17 @@ def add_clue(
     db: Optional[DbSession] = None,
 ) -> SearchSession:
     """Add a clue to the session and record a history snapshot for rewind."""
+    # Deduplicate: if clue with same value, cue_id, or identical label already exists, skip
+    val_norm = str(value).strip().lower()
+    lbl_norm = str(label).strip().lower()
+    for existing in session.clues:
+        if (
+            str(existing.value).strip().lower() == val_norm
+            or (cue_id and existing.cue_id == cue_id)
+            or str(existing.label).strip().lower() == lbl_norm
+        ):
+            return session
+
     # Save snapshot for rewind
     snapshot = {
         "step": session.step,

@@ -17,7 +17,23 @@ export default function ClueTrail({
   onRewind,
   canRewind,
 }: ClueTrailProps) {
-  if (clues.length === 0) return null;
+  // Deduplicate clues by value and label so no repeated chips ever appear
+  const uniqueClues = React.useMemo(() => {
+    const seen = new Set<string>();
+    const res: ClueItem[] = [];
+    for (const clue of clues) {
+      const key = (clue.value || clue.label || clue.id).trim().toLowerCase();
+      const labelKey = (clue.label || '').trim().toLowerCase();
+      if (!seen.has(key) && !seen.has(labelKey)) {
+        seen.add(key);
+        seen.add(labelKey);
+        res.push(clue);
+      }
+    }
+    return res;
+  }, [clues]);
+
+  if (uniqueClues.length === 0) return null;
 
   return (
     <div className="w-full max-w-lg mx-auto mb-5 px-1 flex flex-col gap-1.5">
@@ -40,7 +56,7 @@ export default function ClueTrail({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        {clues.map((clue) => (
+        {uniqueClues.map((clue) => (
           <span
             key={clue.id}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-normal bg-brand-soft text-brand border border-brand/20 transition-all select-none"
