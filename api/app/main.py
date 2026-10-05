@@ -1,5 +1,6 @@
 """FastAPI main application entry point."""
 
+import re
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,10 +44,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static file directories for photos and thumbnails
+from fastapi.responses import FileResponse, Response
+from .routes.photos import get_photo_thumbnail, generate_svg_placeholder
+
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 THUMBS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@app.get("/thumbs/{filename}")
+def serve_thumbnail_file(filename: str):
+    """Serve thumbnail with high-performance caching, dynamic recovery, and zero broken images."""
+    file_path = THUMBS_DIR / filename
+    if file_path.exists() and file_path.stat().st_size > 0:
+        return FileResponse(file_path, media_type="image/webp", headers={"Cache-Control": "public, max-age=86400, immutable"})
+
+    # Extract photo_id and size
+    m = re.match(r"^([a-f0-9]+)_(256|1024)\.webp$", filename, re.IGNORECASE)
+    if m:
+        photo_id, size_str = m.group(1), m.group(2)
+        with Session(engine) as sess:
+            return get_photo_thumbnail(photo_id=photo_id, size=int(size_str), db=sess)
+
+    # Any other thumbnail name fallback
+    svg = generate_svg_placeholder(photo_id=filename, label="Memory")
+    return Response(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/photos/{filename}")
+def serve_photo_file(filename: str):
+    """Serve full-resolution photo with fail-safe fallback."""
+    file_path = PHOTOS_DIR / filename
+    if file_path.exists() and file_path.stat().st_size > 0:
+        return FileResponse(file_path, headers={"Cache-Control": "public, max-age=86400"})
+
+    # Check case-insensitive match or search in photos dir
+    for f in PHOTOS_DIR.iterdir():
+        if f.name.lower() == filename.lower() and f.is_file():
+            return FileResponse(f, headers={"Cache-Control": "public, max-age=86400"})
+
+    svg = generate_svg_placeholder(photo_id=filename, label="Photo")
+    return Response(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=3600"})
+
 
 app.mount("/photos", StaticFiles(directory=str(PHOTOS_DIR)), name="photos")
 app.mount("/thumbs", StaticFiles(directory=str(THUMBS_DIR)), name="thumbs")

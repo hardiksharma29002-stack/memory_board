@@ -22,7 +22,7 @@ eval:
 	python eval/simulate.py
 
 api:
-	python -m uvicorn api.app.main:app --reload --port 8000
+	python -m uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000
 
 web:
 	cmd.exe /c "cd web && npm run dev"

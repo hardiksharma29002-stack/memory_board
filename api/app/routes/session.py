@@ -148,7 +148,11 @@ def add_memory_text(session_id: str, req: AddMemoryTextRequest, db: Session = De
 
     sess.step = "groups"
     positive_cues = [c.value for c in sess.clues if c.type in ("cue", "answer", "sentence")]
-    groups = build_candidate_groups(positive_cues=positive_cues, target_engine=db.bind)
+    groups = build_candidate_groups(
+        positive_cues=positive_cues,
+        target_engine=db.bind,
+        query=sess.initial_query,
+    )
 
     return {
         "session_id": sess.id,
@@ -191,7 +195,34 @@ def select_cues(session_id: str, req: SelectCuesRequest, db: Session = Depends(g
 
     sess.step = "groups"
     positive_cues = [c.value for c in sess.clues if c.type in ("cue", "answer")]
-    groups = build_candidate_groups(positive_cues=positive_cues, target_engine=db.bind)
+    groups = build_candidate_groups(
+        positive_cues=positive_cues,
+        target_engine=db.bind,
+        query=sess.initial_query,
+    )
+
+    return {
+        "session_id": sess.id,
+        "step": sess.step,
+        "clues": [asdict(c) for c in sess.clues],
+        "groups": groups,
+    }
+
+
+@router.post("/{session_id}/skip-to-albums")
+def skip_to_albums_endpoint(session_id: str, db: Session = Depends(get_db_session)):
+    """Skip directly to 4 macro albums preserving all initial query and clue context."""
+    sess = get_session(session_id)
+    if not sess:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    sess.step = "groups"
+    positive_cues = [c.value for c in sess.clues if c.type in ("cue", "answer", "sentence")]
+    groups = build_candidate_groups(
+        positive_cues=positive_cues,
+        target_engine=db.bind,
+        query=sess.initial_query,
+    )
 
     return {
         "session_id": sess.id,
@@ -294,7 +325,11 @@ def answer_question(session_id: str, req: AnswerRequest, db: Session = Depends(g
     if sess.question_count >= 3:
         sess.step = "groups"
         positive_cues = [c.value for c in sess.clues if c.type in ("cue", "answer")]
-        groups = build_candidate_groups(positive_cues=positive_cues, target_engine=db.bind)
+        groups = build_candidate_groups(
+            positive_cues=positive_cues,
+            target_engine=db.bind,
+            query=sess.initial_query,
+        )
         return {
             "session_id": sess.id,
             "step": "groups",
@@ -329,7 +364,11 @@ def answer_question(session_id: str, req: AnswerRequest, db: Session = Depends(g
 
     # If no more questions, transition to groups
     sess.step = "groups"
-    groups = build_candidate_groups(positive_cues=candidate_cues, target_engine=db.bind)
+    groups = build_candidate_groups(
+        positive_cues=candidate_cues,
+        target_engine=db.bind,
+        query=sess.initial_query,
+    )
     return {
         "session_id": sess.id,
         "step": "groups",
@@ -423,7 +462,11 @@ def handle_sentence(session_id: str, req: SentenceRequest, db: Session = Depends
 
     sess.step = "groups"
     positive_cues = [c.value for c in sess.clues if c.type in ("cue", "answer", "sentence")]
-    groups = build_candidate_groups(positive_cues=positive_cues, target_engine=db.bind)
+    groups = build_candidate_groups(
+        positive_cues=positive_cues,
+        target_engine=db.bind,
+        query=sess.initial_query,
+    )
 
     return {
         "session_id": sess.id,

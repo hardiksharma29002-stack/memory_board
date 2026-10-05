@@ -81,6 +81,39 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
     matched_clues = []
     text_lower = user_text.lower()
 
+    # Canonical cue alias dictionary for cognitive mapping
+    cue_aliases = {
+        "people_just_me": "people_solo",
+        "people_1_person": "people_solo",
+        "people_single": "people_solo",
+        "people_2_people": "people_pair",
+        "people_couple": "people_pair",
+        "people_3_5_people": "people_group",
+        "people_friends": "people_group",
+        "people_family": "people_group",
+        "people_big_crowd": "people_crowd",
+        "cafe": "setting_food_place",
+        "restaurant": "setting_food_place",
+        "dhaba": "setting_food_place",
+        "food": "setting_food_place",
+        "beach": "scene_water_beach",
+        "river": "scene_water_beach",
+        "lake": "scene_water_beach",
+        "park": "scene_greenery_park",
+        "garden": "scene_greenery_park",
+        "home": "setting_home",
+        "vehicle": "setting_vehicle",
+        "car": "setting_vehicle",
+        "monument": "scene_buildings",
+        "temple": "scene_temple_festival",
+        "mandir": "scene_temple_festival",
+        "puja": "scene_celebration",
+        "pooja": "scene_celebration",
+        "celebration": "scene_celebration",
+        "aarti": "scene_celebration",
+        "festival": "scene_temple_festival",
+    }
+
     # Rule-based dictionary for immediate latency-free matching
     rules = [
         (r"night|dark|evening|dinner|late", "lighting_night_dark", "Night or dark setting"),
@@ -89,20 +122,24 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
         (r"neon|colorful|party|club|disco", "lighting_neon_lights", "Neon or colorful lights"),
         (r"outdoors|street|outside|park|garden|road", "setting_outdoors", "Outdoors"),
         (r"indoors|inside|room|office|hall", "setting_indoors", "Indoors"),
-        (r"food|cafe|restaurant|chai|tea|eating|meal|snack|stall", "setting_food_place", "Food place or cafe"),
-        (r"wedding|party|birthday|festival|diwali|holi|celebration", "scene_celebration", "Celebration or festival"),
+        (r"food|cafe|restaurant|chai|tea|eating|meal|snack|stall", "setting_food_place", "Cafe / restaurant"),
+        (r"puja|pooja|aarti|prasad|havan|archana|garba|ceremony|ritual", "scene_celebration", "Celebration / puja"),
+        (r"temple|mandir|diyas|diwali|rangoli", "scene_temple_festival", "Festival / rangoli / diyas"),
+        (r"wedding|party|birthday|festival|diwali|holi|celebration", "scene_celebration", "Celebration / puja"),
         (r"beach|sea|water|river|lake|pool", "scene_water_beach", "Water or beach"),
-        (r"alone|solo|myself|selfie|just me", "people_just_me", "Just me"),
-        (r"two of us|couple|friend and me|2 people", "people_2_people", "2 people"),
-        (r"group|friends|family|3 people|4 people|few of us", "people_3_5_people", "3-5 people"),
-        (r"crowd|lots of people|packed|audience", "people_big_crowd", "Big crowd"),
+        (r"alone|solo|myself|selfie|just me", "people_solo", "Just me / 1 person"),
+        (r"two of us|couple|friend and me|2 people", "people_pair", "2 people"),
+        (r"group|friends|family|3 people|4 people|few of us", "people_group", "3 to 5 people"),
+        (r"crowd|lots of people|packed|audience", "people_crowd", "Big crowd"),
     ]
 
     for pattern, cue_id, label in rules:
         if re.search(pattern, text_lower):
+            cid = cue_aliases.get(cue_id, cue_id)
+            lbl = CUE_LOOKUP[cid].label if cid in CUE_LOOKUP else label
             matched_clues.append({
-                "cue_id": cue_id,
-                "label": label,
+                "cue_id": cid,
+                "label": lbl,
                 "source": "memory_text",
             })
             if len(matched_clues) >= 3:
@@ -119,7 +156,7 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
         "Return valid JSON array of objects with keys 'cue_id', 'label'. "
         "Allowed cue_ids include: lighting_warm_yellow, lighting_bright_daylight, lighting_night_dark, "
         "lighting_neon_lights, setting_indoors, setting_outdoors, setting_food_place, scene_celebration, "
-        "scene_water_beach, scene_greenery_park, people_just_me, people_2_people, people_3_5_people, people_big_crowd."
+        "scene_water_beach, scene_greenery_park, people_solo, people_pair, people_group, people_crowd."
     )
     llm_resp = call_groq_chat(f"Memory: '{user_text}'", system_prompt=system_prompt, max_tokens=150)
     if llm_resp:
@@ -130,7 +167,8 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
             if isinstance(parsed, list) and len(parsed) > 0:
                 results = []
                 for item in parsed[:3]:
-                    cid = item.get("cue_id", "")
+                    raw_cid = item.get("cue_id", "")
+                    cid = cue_aliases.get(raw_cid, raw_cid)
                     if cid in CUE_LOOKUP:
                         results.append({
                             "cue_id": cid,
@@ -139,7 +177,7 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
                         })
                     else:
                         results.append({
-                            "cue_id": cid or "custom_clue",
+                            "cue_id": cid or "setting_indoors",
                             "label": item.get("label", user_text[:30]),
                             "source": "groq_ai",
                         })

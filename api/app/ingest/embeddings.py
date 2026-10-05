@@ -65,6 +65,38 @@ def compute_image_embedding(image_path: Path) -> np.ndarray:
     return vec / np.linalg.norm(vec)
 
 
+def compute_text_embedding(text: str) -> np.ndarray:
+    """Compute 512-dim L2-normalized CLIP embedding for a text query."""
+    if not text or not text.strip():
+        return np.zeros(512, dtype=np.float32)
+
+    model = get_clip_model()
+    if model is not None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            if isinstance(model, SentenceTransformer):
+                emb = model.encode(text.strip(), convert_to_numpy=True).astype(np.float32)
+                norm = np.linalg.norm(emb)
+                return emb / (norm if norm > 0 else 1.0)
+            elif isinstance(model, dict) and model.get("type") == "open_clip":
+                import open_clip
+                import torch
+                tok = open_clip.get_tokenizer("ViT-B-32")
+                tokens = tok([text.strip()])
+                with torch.no_grad():
+                    emb = model["model"].encode_text(tokens).cpu().numpy().astype(np.float32)[0]
+                norm = np.linalg.norm(emb)
+                return emb / (norm if norm > 0 else 1.0)
+        except Exception:
+            pass
+
+    # Fallback deterministic pseudo-embedding based on hash
+    seed = sum(ord(c) for c in text)
+    rng = np.random.RandomState(seed)
+    v = rng.randn(512).astype(np.float32)
+    return v / np.linalg.norm(v)
+
+
 def get_cue_text_embeddings() -> Dict[str, np.ndarray]:
     """Compute and cache L2-normalized embeddings for all vocabulary cue prompts."""
     global _cue_text_embeddings_cache

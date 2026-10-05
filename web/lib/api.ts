@@ -241,4 +241,24 @@ export async function fetchSmartCards(
   return res.json();
 }
 
+export async function deletePhoto(photoId: string): Promise<{ status: string; deleted_id: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/photos/${photoId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete photo');
+  return res.json();
+}
+
+export async function skipToAlbums(
+  sessionId: string
+): Promise<{ session_id: string; step: string; clues: ClueItem[]; groups: GroupCardItem[] }> {
+  const res = await fetch(`${API_BASE}/api/session/${sessionId}/skip-to-albums`, {
+    method: 'POST',
+  });
+  if (!res.ok) throw new Error('Failed to skip to albums');
+  return res.json();
+}
+
+
+
 

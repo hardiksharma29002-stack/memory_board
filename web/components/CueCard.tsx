@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CueCardItem } from '../lib/types';
+import SafePhotoThumbnail from './SafePhotoThumbnail';
 import { Check } from 'lucide-react';
 
 interface CueCardProps {
@@ -56,8 +57,10 @@ export default function CueCard({ card, isSelected, onToggle }: CueCardProps) {
       <div className="grid grid-cols-3 gap-1.5 rounded-tile overflow-hidden bg-surfaceMuted p-1">
         {preview_photo_ids.slice(0, 3).map((pid) => (
           <div key={pid} className="aspect-square rounded-md overflow-hidden bg-surfaceMuted">
-            <img
+            <SafePhotoThumbnail
               src={`/thumbs/${pid}_256.webp`}
+              photoId={pid}
+              palette={palette}
               alt="Recognition clue preview"
               className="w-full h-full object-cover"
               loading="lazy"

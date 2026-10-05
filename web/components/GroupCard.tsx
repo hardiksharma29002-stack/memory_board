@@ -3,6 +3,7 @@
 import React from 'react';
 import { GroupCardItem, PhotoItem } from '../lib/types';
 import BandBadge from './BandBadge';
+import SafePhotoThumbnail from './SafePhotoThumbnail';
 import { Check, Sparkles } from 'lucide-react';
 
 interface GroupCardProps {
@@ -78,9 +79,21 @@ export default function GroupCard({
             onClick={() => onPhotoClick(photo)}
             className="group/photo relative shrink-0 w-24 sm:w-28 aspect-square rounded-xl overflow-hidden bg-surfaceMuted border border-borderSubtle hover:border-brand cursor-pointer snap-start transition"
           >
-            <img
+            <SafePhotoThumbnail
               src={photo.thumb_256}
-              alt=""
+              photoId={photo.id}
+              palette={
+                photo.palette
+                  ? (() => {
+                      try {
+                        return JSON.parse(photo.palette);
+                      } catch {
+                        return undefined;
+                      }
+                    })()
+                  : undefined
+              }
+              alt={label || 'Candidate photo'}
               className="w-full h-full object-cover group-hover/photo:scale-105 transition-transform"
               loading="lazy"
             />

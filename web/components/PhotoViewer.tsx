@@ -2,16 +2,18 @@
 
 import React, { useEffect } from 'react';
 import { PhotoItem } from '../lib/types';
-import { X, Check, Calendar, Camera } from 'lucide-react';
+import SafePhotoThumbnail from './SafePhotoThumbnail';
+import { X, Check, Calendar, Camera, Trash2 } from 'lucide-react';
 
 interface PhotoViewerProps {
   photo: PhotoItem | null;
   onClose: () => void;
   onFound: (photoId: string) => void;
   onAlmost: (photoId: string) => void;
+  onDelete?: (photoId: string) => void;
 }
 
-export default function PhotoViewer({ photo, onClose, onFound, onAlmost }: PhotoViewerProps) {
+export default function PhotoViewer({ photo, onClose, onFound, onAlmost, onDelete }: PhotoViewerProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -46,22 +48,41 @@ export default function PhotoViewer({ photo, onClose, onFound, onAlmost }: Photo
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded-full text-textTertiary hover:text-textPrimary hover:bg-surfaceMuted transition cursor-pointer"
-            title="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  onDelete(photo.id);
+                  onClose();
+                }}
+                className="p-1.5 rounded-full text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                title="Delete this photo"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-full text-textTertiary hover:text-textPrimary hover:bg-surfaceMuted transition cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Photo Container */}
-        <div className="flex-1 min-h-[300px] flex items-center justify-center bg-black/90 overflow-hidden p-2">
-          <img
+        <div className="flex-1 min-h-[300px] max-h-[66vh] flex items-center justify-center bg-black/90 overflow-hidden p-2">
+          <SafePhotoThumbnail
             src={photo.thumb_1024 || photo.thumb_256}
+            photoId={photo.id}
+            palette={photo.palette ? (() => { try { return JSON.parse(photo.palette); } catch { return undefined; } })() : undefined}
             alt="Full photo view"
-            className="max-h-[66vh] max-w-full object-contain rounded-md"
+            aspectRatio="contain"
+            className="max-h-[66vh] max-w-full"
           />
         </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import SafePhotoThumbnail from './SafePhotoThumbnail';
 import { X, Clock, Users, MapPin, Palette, HelpCircle } from 'lucide-react';
 
 interface AlmostSheetProps {
@@ -47,11 +48,14 @@ export default function AlmostSheet({
 
         {/* Reference Thumbnail Context */}
         <div className="flex items-center gap-3 p-2.5 rounded-tile bg-surfaceMuted mb-4">
-          <img
-            src={`/thumbs/${photoId}_256.webp`}
-            alt="Reference anchor photo"
-            className="w-12 h-12 object-cover rounded-md shrink-0 bg-surface"
-          />
+          <div className="w-12 h-12 rounded-md overflow-hidden shrink-0 bg-surface">
+            <SafePhotoThumbnail
+              src={`/thumbs/${photoId}_256.webp`}
+              photoId={photoId}
+              alt="Reference anchor photo"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <p className="text-[13px] text-textSecondary leading-snug">
             Choose what differed so we can adjust the search.
           </p>

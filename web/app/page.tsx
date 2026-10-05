@@ -15,6 +15,7 @@ import {
   startSearchSession,
   selectCues,
   noneOfThese,
+  skipToAlbums,
   answerQuestion,
   removeClue,
   rewindSession,
@@ -25,6 +26,7 @@ import {
   addMemoryText,
   fetchPhotoStats,
   fetchSmartCards,
+  deletePhoto,
 } from '../lib/api';
 
 import CueBoard from '../components/CueBoard';
@@ -38,6 +40,7 @@ import FoundView from '../components/FoundView';
 import PhotoViewer from '../components/PhotoViewer';
 import ScrollNudge from '../components/ScrollNudge';
 import PhotoUploadModal from '../components/PhotoUploadModal';
+import SafePhotoThumbnail from '../components/SafePhotoThumbnail';
 import { useScrollNudge } from '../lib/useScrollNudge';
 import { trackEvent } from '../lib/telemetry';
 
@@ -47,7 +50,9 @@ import {
   Moon,
   Sun,
   Sparkles,
-  ImagePlus,
+  Plus,
+  Trash2,
+  X,
 } from 'lucide-react';
 
 export default function MemoryBoardApp() {
@@ -96,6 +101,47 @@ export default function MemoryBoardApp() {
   // Modal & Nudge State
   const [inspectedPhoto, setInspectedPhoto] = useState<PhotoItem | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [deleteToast, setDeleteToast] = useState<string | null>(null);
+
+  const handleDeletePhoto = async (photoId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    // Optimistic UI updates
+    setTimelinePhotos((prev) => prev.filter((p) => p.id !== photoId));
+    if (inspectedPhoto?.id === photoId) {
+      setInspectedPhoto(null);
+    }
+    setLibraryStats((prev) =>
+      prev ? { ...prev, total_photos: Math.max(0, prev.total_photos - 1) } : null
+    );
+
+    setDeleteToast('Photo removed from library');
+    setTimeout(() => setDeleteToast(null), 3200);
+
+    try {
+      await deletePhoto(photoId);
+    } catch (err) {
+      console.error('Failed to delete photo on server:', err);
+      loadTimeline();
+    }
+  };
+
+  const handleSkipToAlbums = async () => {
+    if (!currentSessionId) return;
+    setIsActionLoading(true);
+    try {
+      const res = await skipToAlbums(currentSessionId);
+      setCurrentStep('groups');
+      setClues(res.clues);
+      setGroups(res.groups || []);
+    } catch (err) {
+      console.error('Error skipping to albums:', err);
+      handleSubmitCues([]);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
 
   const {
     showNudge: huntingNudge,
@@ -500,11 +546,12 @@ export default function MemoryBoardApp() {
           <button
             type="button"
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand text-white hover:bg-blue-600 transition shadow-2xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white transition shadow-sm hover:shadow-md cursor-pointer shrink-0 border border-white/20 active:scale-95"
             aria-label="Upload photos to library"
+            title="Upload personal photos to expand library"
           >
-            <ImagePlus className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">Add Photos</span>
+            <Plus className="w-4 h-4 text-white stroke-[2.5]" />
+            <span className="font-semibold whitespace-nowrap">Add Photos</span>
           </button>
 
           {/* Theme Toggle */}
@@ -546,6 +593,7 @@ export default function MemoryBoardApp() {
               onSubmitCues={handleSubmitCues}
               onAddMemoryText={handleAddMemoryText}
               onNoneOfThese={handleNoneOfThese}
+              onSkipToAlbums={handleSkipToAlbums}
               onGenerateSmartCards={handleGenerateSmartCards}
               isLoading={isActionLoading}
             />
@@ -639,9 +687,11 @@ export default function MemoryBoardApp() {
                     className="aspect-square rounded-xl overflow-hidden bg-surfaceMuted border border-borderSubtle relative group cursor-pointer"
                     onClick={() => setInspectedPhoto(p)}
                   >
-                    <img
+                    <SafePhotoThumbnail
                       src={p.thumb_256}
-                      alt=""
+                      photoId={p.id}
+                      palette={p.palette ? (() => { try { return JSON.parse(p.palette); } catch { return undefined; } })() : undefined}
+                      alt="Pivoted photo"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-1">
@@ -736,15 +786,27 @@ export default function MemoryBoardApp() {
                             setInspectedPhoto(photo);
                           }
                         }}
-                        className="aspect-square rounded-xl overflow-hidden bg-surfaceMuted border border-borderSubtle hover:border-brand cursor-pointer transition shadow-xs group"
+                        className="relative aspect-square rounded-xl overflow-hidden bg-surfaceMuted border border-borderSubtle hover:border-brand cursor-pointer transition shadow-xs group"
                         onClick={() => setInspectedPhoto(photo)}
                       >
-                        <img
+                        <SafePhotoThumbnail
                           src={photo.thumb_256}
-                          alt=""
+                          photoId={photo.id}
+                          palette={photo.palette ? (() => { try { return JSON.parse(photo.palette); } catch { return undefined; } })() : undefined}
+                          alt="Timeline photo"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           loading="lazy"
                         />
+                        {/* Quick Delete Cross Icon on Photo Tile */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeletePhoto(photo.id, e)}
+                          title="Delete photo from library"
+                          aria-label="Delete this photo"
+                          className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/60 hover:bg-rose-600 text-white/90 hover:text-white transition opacity-0 group-hover:opacity-100 sm:opacity-0 focus:opacity-100 shadow-sm cursor-pointer z-10"
+                        >
+                          <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -770,6 +832,7 @@ export default function MemoryBoardApp() {
             setInspectedPhoto(null);
             handleTriggerAlmost(pid);
           }}
+          onDelete={(pid) => handleDeletePhoto(pid)}
         />
       )}
 
@@ -805,6 +868,14 @@ export default function MemoryBoardApp() {
           loadLibraryStats();
         }}
       />
+
+      {/* Instant Action Toast */}
+      {deleteToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-xl border border-white/10 flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <Trash2 className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>{deleteToast}</span>
+        </div>
+      )}
     </main>
   );
 }

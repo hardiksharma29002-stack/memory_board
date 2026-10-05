@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CueCardItem, CognitiveCardItem } from '../lib/types';
 import CognitiveCueCard from './CognitiveCueCard';
-import { ArrowRight, Send, Sparkles, HelpCircle } from 'lucide-react';
+import { ArrowRight, Send, Sparkles, Zap } from 'lucide-react';
 
 interface CueBoardProps {
   cards: CueCardItem[];
@@ -13,6 +13,7 @@ interface CueBoardProps {
   onSubmitCues: (selectedCueIds: string[]) => void;
   onAddMemoryText?: (text: string) => void;
   onNoneOfThese: () => void;
+  onSkipToAlbums?: () => void;
   onSwitchToSentenceMode?: () => void;
   onGenerateSmartCards?: (query: string) => void;
   isLoading?: boolean;
@@ -25,6 +26,7 @@ export default function CueBoard({
   onSubmitCues,
   onAddMemoryText,
   onNoneOfThese,
+  onSkipToAlbums,
   onGenerateSmartCards,
   isLoading = false,
 }: CueBoardProps) {
@@ -70,18 +72,31 @@ export default function CueBoard({
             </h2>
           </div>
 
-          {onGenerateSmartCards && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {onGenerateSmartCards && (
+              <button
+                type="button"
+                onClick={() => onGenerateSmartCards(customMemory || searchQuery)}
+                disabled={isLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-soft text-brand hover:bg-brand hover:text-white transition cursor-pointer shadow-2xs border border-brand/30"
+                title="Use Groq AI to synthesize smarter memory cards from your search"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Smarter AI Cards</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={() => onGenerateSmartCards(customMemory || searchQuery)}
+              onClick={onSkipToAlbums || onNoneOfThese}
               disabled={isLoading}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-soft text-brand hover:bg-brand hover:text-white transition cursor-pointer shadow-2xs border border-brand/30"
-              title="Use Groq AI to synthesize smarter memory cards from your search"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/40 hover:border-amber-500/70 transition cursor-pointer shadow-xs active:scale-95"
+              title="Skip straight to candidate albums without selecting cards"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Smarter AI Cards (Groq)</span>
+              <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Skip Straight to 4 Albums →</span>
             </button>
-          )}
+          </div>
         </div>
 
         <p className="text-xs sm:text-sm text-textSecondary max-w-2xl leading-relaxed">
@@ -132,11 +147,11 @@ export default function CueBoard({
         <button
           type="button"
           disabled={isLoading}
-          onClick={onNoneOfThese}
-          className="text-xs text-textSecondary hover:text-textPrimary font-medium py-2 px-3 rounded-lg hover:bg-surfaceMuted transition cursor-pointer flex items-center gap-1.5"
+          onClick={onSkipToAlbums || onNoneOfThese}
+          className="text-xs sm:text-sm text-textSecondary hover:text-textPrimary font-semibold py-2 px-3 rounded-lg hover:bg-surfaceMuted transition cursor-pointer flex items-center gap-1.5"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
-          <span>None of these match (Skip to albums)</span>
+          <Zap className="w-4 h-4 text-amber-500" />
+          <span>Skip Straight to 4 Albums →</span>
         </button>
 
         <button

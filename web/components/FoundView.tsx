@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { PhotoItem } from '../lib/types';
+import SafePhotoThumbnail from './SafePhotoThumbnail';
 import { ArrowLeft, Check, Share2, PlusSquare, CheckCheck } from 'lucide-react';
 
 interface FoundViewProps {
@@ -67,10 +68,13 @@ export default function FoundView({
 
       {/* Hero Photo Display per Section 22 (object-fit: contain) */}
       <div className="w-full aspect-[4/3] rounded-card overflow-hidden bg-black/5 border border-borderSubtle mb-4 flex items-center justify-center shadow-card">
-        <img
+        <SafePhotoThumbnail
           src={`/thumbs/${photo.id}_1024.webp`}
+          photoId={photo.id}
+          palette={photo.palette ? (() => { try { return JSON.parse(photo.palette); } catch { return undefined; } })() : undefined}
           alt="Found target photo"
-          className="w-full h-full object-contain"
+          aspectRatio="contain"
+          className="w-full h-full"
         />
       </div>
 
@@ -151,8 +155,10 @@ export default function FoundView({
                     : 'border-borderSubtle opacity-75 hover:opacity-100'
                 }`}
               >
-                <img
+                <SafePhotoThumbnail
                   src={p.thumb_256}
+                  photoId={p.id}
+                  palette={p.palette ? (() => { try { return JSON.parse(p.palette); } catch { return undefined; } })() : undefined}
                   alt="Related thumbnail"
                   className="w-full h-full object-cover"
                 />

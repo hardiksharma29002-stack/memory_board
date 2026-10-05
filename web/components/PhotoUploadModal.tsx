@@ -74,13 +74,6 @@ export default function PhotoUploadModal({
       return;
     }
 
-    if (!replaceExisting && selectedFiles.length > stats.available_slots) {
-      setErrorMessage(
-        `Selected ${selectedFiles.length} photos exceeds available capacity (${stats.available_slots} slots left). Either select fewer photos or check 'Replace demo photos'.`
-      );
-      return;
-    }
-
     setIsLoading(true);
     setStatusMessage('Uploading and extracting CLIP AI embeddings...');
     setErrorMessage(null);
@@ -189,8 +182,8 @@ export default function PhotoUploadModal({
             />
           </div>
           <p className="text-[11px] text-textSecondary mt-1.5 flex items-center justify-between">
-            <span>Slots remaining: {Math.max(0, stats.cap - stats.total_photos)}</span>
-            <span className="text-xs font-medium text-brand">Cap: 500 Photos</span>
+            <span>Library capacity: {stats.total_photos} photos</span>
+            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto-expanding (unlimited)</span>
           </p>
         </div>
 
