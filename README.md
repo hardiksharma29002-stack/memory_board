@@ -6,30 +6,34 @@
 
 ## 🌟 Key Features
 
-1. **Incomplete Memory Search (1, 2, or 3 Clues)**:
+1. **Two-Stage Intelligent Scroll Nudge**:
+   - Initial gentle prompt (*"Find photos by memory"*) appears when browsing.
+   - Detects active continuous scrolling (1.2–2.0s) and automatically transitions to a live pulsing badge (*"⚡ Scrolling detected"*), nudging the user toward cognitive retrieval instead of endless manual hunting.
+
+2. **Guided Recall Question Sheet**:
+   - When photos aren't in candidate albums or when user taps *"Not here"*, Shannon entropy calculates the most informative question.
+   - 4 large touch options with a prominent **"Can't recall"** fallback button, preventing retrieval dead-ends.
+
+3. **Incomplete Memory Search (1, 2, or 3 Clues)**:
    - Type freeform vague memories (e.g. *"night street food with friends near yellow lights"*).
    - Fast Groq LLM inference (`qwen/qwen3.8-27b`) and local rules automatically parse memories into structured cognitive anchors.
    - Quick 1-tap starter clue chips (*Festivals & Warm Lights*, *Street Food*, *Group of 3-5*, *Sunset Trip*, *Monuments*).
 
-2. **Non-Pictorial Cognitive Cue Cards**:
+4. **Non-Pictorial Cognitive Cue Cards**:
    - Conceptual episodic triggers instead of thumbnail preview strips: Lighting & Atmosphere, Social Presence, Setting & Venue, Dominant Mood.
    - User can **type or select an option** at every point.
 
-3. **4 Macro Albums with Calibrated Confidence Percentages**:
-   - Clusters candidate photos into 4 macro albums of 15–20 photos each.
-   - Every album features a bold, high-contrast confidence percentage pill (e.g. `88% High Confidence`, `74% Good Match`).
+5. **4 Macro Albums with Dynamic Titling & Calibrated Confidence**:
+   - Context-aware naming ensures every album title is unique, descriptive, and non-repetitive.
+   - Clusters candidate photos into 4 macro albums with calibrated confidence percentage badges (e.g. `88% High Confidence`, `74% Good Match`).
 
-4. **Zero Context Loss Fallback & AI Probes**:
-   - When tapping *"Not here"*, the system locks and preserves all active clues.
+6. **Zero Context Loss Fallback & AI Probes**:
+   - Preserves all active clues when exploring secondary hypotheses.
    - Synthesizes fresh contextual memory probes and checks simulated hiding places (Archive, Trash, Locked Folder, Device Storage).
 
-5. **400+ Photo Dataset**:
+7. **400+ Photo Dataset & Self-Healing Pipeline**:
    - 412 authentic Indian daily-life moments (festivals, street food, monuments, nature, night lights, family gatherings).
-   - Local CLIP ViT-B/32 embeddings, k-means color palettes, and WebP thumbnails.
-
-6. **Accessibility First ("Visible Even to a Blind")**:
-   - WCAG AAA contrast compliance, bold indicators, min 48px touch targets.
-   - Comprehensive ARIA screen reader attributes (`role="region"`, `role="checkbox"`, `aria-live="polite"`).
+   - Automated idempotent sync and thumbnail recovery for any externally uploaded photos.
 
 ---
 
