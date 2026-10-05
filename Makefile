@@ -30,5 +30,12 @@ web:
 ingest:
 	python -m api.app.ingest.pipeline
 
+sync:
+	python -c "from api.app.ingest.pipeline import sync_unindexed_photos; sync_unindexed_photos(verbose=True)"
+
+bench:
+	python scripts/benchmark_latency.py
+
 wipe:
 	rm -rf data/thumbs/* data/app.db data/embeddings.npy
+
