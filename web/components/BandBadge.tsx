@@ -50,17 +50,27 @@ export default function BandBadge({ confidence }: BandBadgeProps) {
       'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-800';
   }
 
-  // Clean label string
-  const cleanLabelText = label.replace(/^\d+%\s*/, '');
+  // Determine clean band label (e.g. 'Highest chance', 'Good chance', 'Possible')
+  let bandLabel = 'Possible match';
+  if (typeof confidence === 'object' && confidence !== null) {
+    bandLabel = confidence.band_label || '';
+  } else {
+    bandLabel = label.replace(/^Confidence Score\s*=\s*\d+%\s*·?\s*/i, '').replace(/^\d+%\s*/, '');
+  }
+
+  // Filter out any redundant 'Confidence Score' text if present in bandLabel
+  bandLabel = bandLabel.replace(/^Confidence Score\s*=\s*\d+%\s*·?\s*/i, '').trim();
 
   return (
     <span
       role="status"
-      aria-label={`Match confidence: ${percentage} percent, status: ${label}`}
+      aria-label={`Confidence Score = ${percentage} percent, status: ${bandLabel || 'Calculated'}`}
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border shadow-2xs ${badgeStyle}`}
     >
       <span className="font-bold">Confidence Score = {percentage}%</span>
-      {cleanLabelText && <span className="opacity-80 font-normal">· {cleanLabelText}</span>}
+      {bandLabel && bandLabel !== `${percentage}%` && (
+        <span className="opacity-80 font-normal">· {bandLabel}</span>
+      )}
     </span>
   );
 }

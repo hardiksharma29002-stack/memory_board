@@ -191,24 +191,23 @@ export default function MemoryBoardApp() {
       setCurrentSessionId(res.session_id);
       setCards(res.cards || []);
       setCognitiveCards(res.cognitive_cards || []);
+      setClues(res.initial_clues || []);
 
+      // Always present the 4 Big Square Cognitive Cards first to complete lost memory
+      setCurrentStep('cue_board');
+
+      // Use Groq AI intelligence to personalize the 4 square cards based on the user's search query
       if (initialQuery && initialQuery.trim()) {
-        // If user typed a query, parse clues and immediately show the 4 Macro Albums!
-        if (res.initial_clues && res.initial_clues.length > 0) {
-          setClues(res.initial_clues);
-          const clueValues = res.initial_clues.map((c) => c.value);
-          const groupRes = await selectCues(res.session_id, clueValues);
-          setGroups(groupRes.groups || []);
-          setCurrentStep('groups');
-        } else {
-          setClues([]);
-          setCurrentStep('cue_board');
-        }
-      } else {
-        // If user opened memory search without typing, present compact cue cards
-        setClues(res.initial_clues || []);
-        setCurrentStep('cue_board');
+        const clueValues = (res.initial_clues || []).map((c) => c.value);
+        fetchSmartCards(initialQuery, clueValues)
+          .then((smart) => {
+            if (smart.cards && smart.cards.length >= 2) {
+              setCognitiveCards(smart.cards);
+            }
+          })
+          .catch(() => {});
       }
+
       trackEvent('session_start', { entry: 'search_pill' }, res.session_id);
     } catch (err) {
       console.error(err);
@@ -526,7 +525,7 @@ export default function MemoryBoardApp() {
 
       {/* ─── Search Mode Active ────────────────────────────────────────────── */}
       {isSearchActive ? (
-        <section className="flex-1 w-full max-w-3xl mx-auto px-4 py-4">
+        <section className="flex-1 w-full max-w-4xl mx-auto px-4 py-4">
           {/* Subtle Clue Trail */}
           {currentStep !== 'found' && (
             <ClueTrail
@@ -537,11 +536,13 @@ export default function MemoryBoardApp() {
             />
           )}
 
-          {/* Step 1: Cue Board (Cards ONLY appear when user requests them or searches) */}
+          {/* Step 1: Cue Board (4 Big Square Cards for cognitive memory completion) */}
           {currentStep === 'cue_board' && (
             <CueBoard
               cards={cards}
               cognitiveCards={cognitiveCards}
+              initialSelected={clues.map((c) => c.value)}
+              searchQuery={vagueMemoryQuery}
               onSubmitCues={handleSubmitCues}
               onAddMemoryText={handleAddMemoryText}
               onNoneOfThese={handleNoneOfThese}
@@ -562,21 +563,22 @@ export default function MemoryBoardApp() {
           {/* Step 2: 4 Macro Albums (Clean & Uncluttered) */}
           {currentStep === 'groups' && (
             <div className="w-full mx-auto">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <div>
                   <h2 className="text-xl font-bold text-textPrimary tracking-tight">
                     4 Macro Albums
                   </h2>
                   <p className="text-xs text-textSecondary">
-                    Clustered by your memory cues with calibrated confidence scores.
+                    Clustered by your completed memory cues with calibrated confidence scores.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setCurrentStep('cue_board')}
-                  className="text-xs text-brand hover:underline font-medium"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-soft text-brand hover:bg-brand hover:text-white transition cursor-pointer border border-brand/20 shadow-2xs"
                 >
-                  Edit cues
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Adjust Memory Cards</span>
                 </button>
               </div>
 

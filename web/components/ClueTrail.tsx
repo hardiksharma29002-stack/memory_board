@@ -30,11 +30,11 @@ export default function ClueTrail({
           <button
             type="button"
             onClick={onRewind}
-            className="inline-flex items-center gap-1 text-[13px] font-medium text-brand hover:underline px-2 py-0.5 rounded transition cursor-pointer"
-            title="Undo last action"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-brand bg-brand-soft hover:bg-brand hover:text-white border border-brand/20 transition cursor-pointer shadow-2xs"
+            title="Rewind: Undo your last added clue and step back one memory step"
           >
             <Undo2 className="w-3.5 h-3.5" />
-            <span>Rewind</span>
+            <span>Rewind (Undo Last Clue)</span>
           </button>
         )}
       </div>
