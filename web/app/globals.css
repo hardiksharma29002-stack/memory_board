@@ -88,3 +88,19 @@ button {
   background: rgba(128, 134, 139, 0.5);
 }
 
+/* Nudge animations & hardware acceleration */
+.nudge-float {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.5s infinite ease-in-out;
+}
+
+
