@@ -1,0 +1,65 @@
+# Data & SQLite & Embeddings
+data/
+*.db
+*.npy
+
+# Survey & PDF Research Files (User requirement: no survey or research PDFs)
+*.pdf
+GooglePhotos_Interviews (1).pdf
+Product_Manager_Fellowship_Graduation_Project.pdf
+Survey_ How People Find Their Photos (Responses) - Form Responses 1.pdf
+survey_results.pdf
+build_git_commits.py
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+/lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment & IDE
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
