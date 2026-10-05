@@ -158,6 +158,7 @@ export default function MemoryBoardApp() {
   // Load photos on mount
   useEffect(() => {
     loadTimeline();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isNudgeVisible = huntingNudge && !isSearchActive;

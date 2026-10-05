@@ -55,8 +55,23 @@ class TelemetryLogger {
   }
 }
 
+let _instance: TelemetryLogger | null = null;
+
+export function getTelemetryLogger(): TelemetryLogger {
+  if (!_instance) {
+    _instance = new TelemetryLogger();
+  }
+  return _instance;
+}
+
+export const telemetry = typeof window !== 'undefined' ? getTelemetryLogger() : new TelemetryLogger();
+
 export function trackEvent(name: string, payload: Record<string, unknown> = {}, sessionId?: string) {
-  telemetry.track(name, payload, sessionId);
+  try {
+    getTelemetryLogger().track(name, payload, sessionId);
+  } catch {
+    // Fail-safe: telemetry should never disrupt user experience
+  }
 }
 
 export function trackQuestionAnswered(questionId: string, optionId: string, sessionId?: string) {
@@ -66,4 +81,5 @@ export function trackQuestionAnswered(questionId: string, optionId: string, sess
 export function trackNudgeStageChange(stage: string, durationMs?: number) {
   trackEvent('nudge_stage_changed', { stage, duration_ms: durationMs });
 }
+
 
