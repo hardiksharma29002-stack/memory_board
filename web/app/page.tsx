@@ -53,6 +53,7 @@ import {
   Plus,
   Trash2,
   X,
+  HelpCircle,
 } from 'lucide-react';
 
 export default function MemoryBoardApp() {
@@ -145,6 +146,7 @@ export default function MemoryBoardApp() {
 
   const {
     showNudge: huntingNudge,
+    nudgeStage,
     handleDismiss: dismissHuntingNudge,
     handleAccept: acceptHuntingNudge,
   } = useScrollNudge({
@@ -640,18 +642,26 @@ export default function MemoryBoardApp() {
                     onPhotoClick={(p) => setInspectedPhoto(p)}
                     onFound={(pid) => handleConfirmFound(pid)}
                     onAlmost={(pid) => handleTriggerAlmost(pid)}
-                    onNotHere={handleTriggerFallback}
+                    onNotHere={handleNoneOfThese}
                   />
                 ))}
               </div>
 
-              <div className="pt-4 pb-6 text-center border-t border-borderSubtle mt-4">
+              <div className="pt-4 pb-6 border-t border-borderSubtle mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleNoneOfThese}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-brand text-white hover:bg-blue-600 transition shadow-xs cursor-pointer active:scale-98"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span>Can&apos;t find your photo? Answer Guided Questions</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleTriggerFallback}
                   className="text-xs font-semibold text-textSecondary hover:text-textPrimary py-2 px-4 rounded-xl hover:bg-surfaceMuted transition cursor-pointer"
                 >
-                  Not in these 4 albums? Let&apos;s probe deeper (keeps context)
+                  Or probe deeper with open memory prompts
                 </button>
               </div>
             </div>
@@ -664,6 +674,7 @@ export default function MemoryBoardApp() {
               stepIndex={questionProgress.current}
               totalSteps={questionProgress.total}
               onSelectOption={handleAnswerQuestion}
+              onClose={() => setCurrentStep('groups')}
               isLoading={isActionLoading}
             />
           )}
@@ -849,6 +860,7 @@ export default function MemoryBoardApp() {
       {/* Scroll Nudge Bottom Sheet */}
       {isNudgeVisible && (
         <ScrollNudge
+          stage={nudgeStage}
           onAccept={() => {
             acceptHuntingNudge();
             handleStartSearch();
