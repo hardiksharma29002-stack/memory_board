@@ -1,0 +1,42 @@
+{
+  "board": {
+    "prompt": "Does any of these ring a bell?",
+    "none": "None of these",
+    "fill_in": "Fill it in",
+    "cues_tab": "Memory Cues",
+    "sentence_tab": "Describe Scene"
+  },
+  "question": {
+    "cant": "Can't recall",
+    "progress": "Question {current} of {total}"
+  },
+  "groups": {
+    "highest": "Highest chance",
+    "good": "Good chance",
+    "possible": "Possible",
+    "unsure": "Not sure yet. One more question?",
+    "found": "Found it",
+    "almost": "Almost!",
+    "not_here": "Not here",
+    "shared_before": "You shared this before"
+  },
+  "nudge": {
+    "title": "Looking for a photo?",
+    "subtitle": "Find it by what you remember.",
+    "action": "Find by memory",
+    "dismiss": "Not now"
+  },
+  "almost": {
+    "title": "What's different?",
+    "diff_time": "Different time of day",
+    "diff_place": "Different place",
+    "diff_people": "Different people",
+    "diff_look": "Different look or clothes",
+    "cant_say": "Can't say"
+  },
+  "fallback": {
+    "ladder_title": "Broadening Search",
+    "relaxed": "We relaxed '{clue}' to show more moments.",
+    "timeline_button": "Browse in Timeline"
+  }
+}

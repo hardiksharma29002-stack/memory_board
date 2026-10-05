@@ -1,0 +1,42 @@
+{
+  "board": {
+    "prompt": "Inme se kuch yaad aa raha hai?",
+    "none": "Inme se koi nahi",
+    "fill_in": "Khali jagah bharo",
+    "cues_tab": "Yaadein",
+    "sentence_tab": "Scene samjhao"
+  },
+  "question": {
+    "cant": "Yaad nahi",
+    "progress": "Sawaal {current} / {total}"
+  },
+  "groups": {
+    "highest": "Sabse zyada chance",
+    "good": "Accha chance",
+    "possible": "Ho sakti hai",
+    "unsure": "Abhi pakka nahi. Ek aur sawaal?",
+    "found": "Mil gayi!",
+    "almost": "Lagbhag yahi!",
+    "not_here": "Yahan nahi hai",
+    "shared_before": "Aapne pehle share kiya tha"
+  },
+  "nudge": {
+    "title": "Photo dhoondh rahe ho?",
+    "subtitle": "Jo yaad hai usse dhoondho.",
+    "action": "Yaad se dhoondho",
+    "dismiss": "Abhi nahi"
+  },
+  "almost": {
+    "title": "Kya alag hai?",
+    "diff_time": "Waqt alag tha (subah/shaam/raat)",
+    "diff_place": "Jagah alag thi",
+    "diff_people": "Log alag the",
+    "diff_look": "Kapde ya colours alag the",
+    "cant_say": "Keh nahi sakte"
+  },
+  "fallback": {
+    "ladder_title": "Search bada rahe hain",
+    "relaxed": "Humne '{clue}' ko hataya taaki aur photos mil sakein.",
+    "timeline_button": "Timeline mein dekhein"
+  }
+}
