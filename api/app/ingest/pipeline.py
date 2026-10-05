@@ -87,7 +87,7 @@ def run_ingestion(
         photo_files = [Path(p) for p in file_paths if Path(p).is_file()]
     else:
         photo_files = [
-            f for f in photos_dir.iterdir()
+            f for f in photos_dir.rglob("*")
             if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
         ]
 
@@ -257,6 +257,40 @@ def run_ingestion(
         "failed": failed_count,
         "total": len(photo_files),
     }
+
+
+def sync_unindexed_photos(target_engine=None, verbose: bool = False) -> int:
+    """Find any unindexed photos in data/photos/ (including subfolders) and index them idempotently."""
+    eng = target_engine or engine
+    init_db(eng)
+
+    if not PHOTOS_DIR.exists():
+        return 0
+
+    all_files = [
+        f for f in PHOTOS_DIR.rglob("*")
+        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+    ]
+    if not all_files:
+        return 0
+
+    with Session(eng) as session:
+        existing_ids = set(session.exec(select(Photo.id)).all())
+
+    unindexed = [f for f in all_files if get_photo_id(f) not in existing_ids]
+    if not unindexed:
+        return 0
+
+    if verbose:
+        print(f"📷 Discovered {len(unindexed)} external unindexed photo(s). Indexing now...")
+
+    stats = run_ingestion(
+        photos_dir=PHOTOS_DIR,
+        target_engine=eng,
+        file_paths=unindexed,
+        verbose=verbose,
+    )
+    return stats.get("processed", 0)
 
 
 if __name__ == "__main__":
