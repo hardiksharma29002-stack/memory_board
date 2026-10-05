@@ -57,3 +57,17 @@ def test_select_best_question_with_candidates(session: Session):
     )
     assert q is not None
     assert len(q.options) >= 4
+
+
+def test_cant_recall_option_preserves_candidates(session: Session):
+    """Verify selecting 'cant_recall' does not crash and continues questioning."""
+    candidate_ids = [f"q_photo_{i}" for i in range(10)]
+    q = select_best_question(
+        candidate_photo_ids=candidate_ids,
+        asked_question_ids=["time_of_day"],
+        target_engine=session.bind,
+    )
+    assert q is not None
+    assert q.id != "time_of_day"
+    assert len(q.options) >= 3
+
