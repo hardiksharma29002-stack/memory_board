@@ -45,10 +45,10 @@ CUES: List[Cue] = [
     Cue("scene_greenery_park", "scene", "Greenery / park", "green park garden trees plants grass nature lawn"),
     Cue("scene_rooftop", "scene", "Rooftop / terrace", "rooftop terrace balcony city view open sky parapet"),
     Cue("scene_crowd", "scene", "Crowd / gathering", "crowd of people gathering audience group celebration"),
-    Cue("scene_celebration", "scene", "Celebration / puja", "celebration party birthday cake garlands festival puja ritual"),
+    Cue("scene_celebration", "scene", "Celebrations & Events", "celebration party birthday cake anniversary gathering festival ceremony event"),
     Cue("scene_buildings", "scene", "Buildings / monuments", "city buildings architecture monument temple fort towers"),
     Cue("scene_mountains", "scene", "Hills / mountains", "mountains hills valley mountain road nature landscape"),
-    Cue("scene_temple_festival", "scene", "Festival / rangoli / diyas", "diwali diyas rangoli holi colors festive temple decoration"),
+    Cue("scene_temple_festival", "scene", "Festivals & Decorations", "diwali diyas rangoli holi colors festive celebration decoration"),
 
     # 👥 People (4 rule-based cues from face_count)
     Cue("people_solo", "people", "Just me / 1 person", "portrait single person one person alone", is_rule_based=True),
