@@ -97,3 +97,12 @@ export interface SearchSessionState {
   preserved_context?: string[];
 }
 
+export type NudgeStage = 'initial' | 'scrolling_detected';
+
+export interface QuestionAnswerPayload {
+  session_id: string;
+  question_id: string;
+  option_id: string;
+}
+
+
