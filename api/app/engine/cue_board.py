@@ -79,8 +79,8 @@ CUE_METADATA: Dict[str, dict] = {
     },
     "scene_celebration": {
         "dimension": "Background & Setting",
-        "tags": ["#festival", "#puja", "#party", "#birthday", "#decor"],
-        "hint": "Celebration, birthday party or ceremony",
+        "tags": ["#celebration", "#gathering", "#party", "#birthday", "#decor"],
+        "hint": "Celebration, birthday party or event",
     },
     "scene_temple_festival": {
         "dimension": "Background & Setting",
