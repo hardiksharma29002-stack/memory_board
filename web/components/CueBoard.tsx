@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CueCardItem, CognitiveCardItem } from '../lib/types';
 import CognitiveCueCard from './CognitiveCueCard';
-import { ArrowRight, Send, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Send, Sparkles, Zap, HelpCircle } from 'lucide-react';
 
 interface CueBoardProps {
   cards: CueCardItem[];
@@ -88,7 +88,18 @@ export default function CueBoard({
 
             <button
               type="button"
-              onClick={onSkipToAlbums || onNoneOfThese}
+              onClick={onNoneOfThese}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-surfaceMuted hover:bg-brand-soft hover:text-brand hover:border-brand/40 text-textSecondary transition cursor-pointer border border-borderSubtle"
+              title="Don't see matching clues? Answer guided questions"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-brand" />
+              <span>None of these? Guided Questions</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onSkipToAlbums}
               disabled={isLoading}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/40 hover:border-amber-500/70 transition cursor-pointer shadow-xs active:scale-95"
               title="Skip straight to candidate albums without selecting cards"
@@ -144,15 +155,27 @@ export default function CueBoard({
 
       {/* 4. Action Bar */}
       <div className="flex items-center justify-between pt-4 border-t border-borderSubtle gap-3 flex-wrap">
-        <button
-          type="button"
-          disabled={isLoading}
-          onClick={onSkipToAlbums || onNoneOfThese}
-          className="text-xs sm:text-sm text-textSecondary hover:text-textPrimary font-semibold py-2 px-3 rounded-lg hover:bg-surfaceMuted transition cursor-pointer flex items-center gap-1.5"
-        >
-          <Zap className="w-4 h-4 text-amber-500" />
-          <span>Skip Straight to 4 Albums →</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={onNoneOfThese}
+            className="text-xs sm:text-sm text-brand hover:text-blue-600 font-semibold py-2 px-3 rounded-lg hover:bg-brand-soft transition cursor-pointer flex items-center gap-1.5 border border-brand/20"
+          >
+            <HelpCircle className="w-4 h-4 text-brand" />
+            <span>None of these? Guided Questions →</span>
+          </button>
+
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={onSkipToAlbums}
+            className="text-xs sm:text-sm text-textSecondary hover:text-textPrimary font-semibold py-2 px-3 rounded-lg hover:bg-surfaceMuted transition cursor-pointer flex items-center gap-1.5"
+          >
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span>Skip to 4 Albums →</span>
+          </button>
+        </div>
 
         <button
           type="button"
