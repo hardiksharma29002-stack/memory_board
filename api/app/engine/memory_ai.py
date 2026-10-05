@@ -9,7 +9,7 @@ import json
 import re
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 import requests
 
 from ..vocab import CUE_LOOKUP, CUES
@@ -122,10 +122,11 @@ def parse_vague_memory_to_clues(user_text: str) -> List[Dict[str, str]]:
         (r"neon|colorful|party|club|disco", "lighting_neon_lights", "Neon or colorful lights"),
         (r"outdoors|street|outside|park|garden|road", "setting_outdoors", "Outdoors"),
         (r"indoors|inside|room|office|hall", "setting_indoors", "Indoors"),
-        (r"food|cafe|restaurant|chai|tea|eating|meal|snack|stall", "setting_food_place", "Cafe / restaurant"),
-        (r"puja|pooja|aarti|prasad|havan|archana|garba|ceremony|ritual", "scene_celebration", "Celebration / puja"),
-        (r"temple|mandir|diyas|diwali|rangoli", "scene_temple_festival", "Festival / rangoli / diyas"),
-        (r"wedding|party|birthday|festival|diwali|holi|celebration", "scene_celebration", "Celebration / puja"),
+        (r"food|cafe|restaurant|chai|tea|eating|meal|snack|stall|dining", "setting_food_place", "Cafe / restaurant"),
+        (r"puja|pooja|aarti|prasad|havan|archana|garba|ritual", "scene_celebration", "Puja & Rituals"),
+        (r"temple|mandir", "scene_buildings", "Temple / Heritage"),
+        (r"wedding|party|birthday|anniversary|celebration|event", "scene_celebration", "Celebrations & Events"),
+        (r"diyas|diwali|rangoli|holi|festive", "scene_temple_festival", "Festive Celebrations"),
         (r"beach|sea|water|river|lake|pool", "scene_water_beach", "Water or beach"),
         (r"alone|solo|myself|selfie|just me", "people_solo", "Just me / 1 person"),
         (r"two of us|couple|friend and me|2 people", "people_pair", "2 people"),
@@ -232,7 +233,7 @@ def generate_cognitive_cue_cards(selected_clues: List[str]) -> List[Dict[str, An
                 {"id": "setting_food_place", "label": "Food stall, restaurant, or cafe table", "icon": "coffee"},
                 {"id": "setting_outdoors", "label": "Open-air street, park, or tourist sight", "icon": "compass"},
                 {"id": "setting_indoors", "label": "Cozy home room, hall, or workspace", "icon": "home"},
-                {"id": "scene_celebration", "label": "Festive venue, wedding, or puja stage", "icon": "gift"},
+                {"id": "scene_celebration", "label": "Celebration, party, or special event", "icon": "gift"},
             ],
         },
         {
@@ -241,7 +242,7 @@ def generate_cognitive_cue_cards(selected_clues: List[str]) -> List[Dict[str, An
             "category": "Visual Tone",
             "description": "What color or vibe stands out in your recollection?",
             "options": [
-                {"id": "color_warm", "label": "Rich red, orange, and marigold festive tones", "icon": "palette"},
+                {"id": "color_warm", "label": "Rich warm, golden, or vibrant colors", "icon": "palette"},
                 {"id": "color_cool", "label": "Deep blues, sky, water, or lush greenery", "icon": "droplet"},
                 {"id": "scene_water_beach", "label": "Riverside, ghat, beach, or rain glistening", "icon": "waves"},
                 {"id": "scene_greenery_park", "label": "Lush trees, gardens, or natural scenery", "icon": "trees"},
