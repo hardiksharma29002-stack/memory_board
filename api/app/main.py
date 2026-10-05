@@ -104,17 +104,22 @@ app.include_router(events_router)
 
 @app.get("/api/health")
 def health_check():
-    """Health check endpoint returning system status and photo index count."""
+    """Health check endpoint returning system status, photo index count, and storage status."""
     photo_count = 0
+    thumbs_count = 0
     try:
         with Session(engine) as session:
             photo_count = session.exec(select(func.count(Photo.id))).one()
+        if THUMBS_DIR.exists():
+            thumbs_count = len(list(THUMBS_DIR.glob("*")))
     except Exception:
         pass
 
     return {
         "status": "ok",
         "photos_indexed": photo_count,
+        "thumbnails_cached": thumbs_count,
         "config_loaded": True,
         "min_library_for_board": CONFIG.board.min_library_for_board,
     }
+
