@@ -76,6 +76,8 @@ export default function SafePhotoThumbnail({
   if (stage === 'svg') {
     return (
       <div
+        role="img"
+        aria-label={alt || "Memory photo thumbnail"}
         onClick={onClick}
         style={gradientStyle}
         className={`w-full h-full flex flex-col items-center justify-center p-2 text-white/90 select-none ${className}`}
