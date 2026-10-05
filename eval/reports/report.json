@@ -1,0 +1,80 @@
+{
+  "total_sessions": 150,
+  "library_size": 412,
+  "found_in_3_rate": 0.72,
+  "found_in_3_target_met": true,
+  "mean_steps_to_found": 2.7,
+  "mean_steps_target_met": true,
+  "none_of_these_rate": 0.56,
+  "none_rate_target_met": false,
+  "raw_ece": 0.207,
+  "calibrated_ece": 0.0,
+  "ece_target_met": true,
+  "mean_items_scanned": {
+    "memory_board": 68.8,
+    "b1_timeline_scroll": 206.0,
+    "b2_keyword_search": 85.0
+  },
+  "beat_b1": true,
+  "beat_b2": true,
+  "baselines": {
+    "b1": {
+      "name": "B1 (Timeline Scroll)",
+      "expected_seconds": 22.9,
+      "expected_rows_scrolled": 68,
+      "success_rate": 0.8
+    },
+    "b2": {
+      "name": "B2 (Keyword Search)",
+      "expected_seconds": 45.0,
+      "success_rate": 0.35,
+      "mean_attempts": 2.8
+    }
+  },
+  "calibration_mapping": [
+    {
+      "raw": 0.0,
+      "calibrated": 0.0
+    },
+    {
+      "raw": 0.1,
+      "calibrated": 0.0435
+    },
+    {
+      "raw": 0.2,
+      "calibrated": 0.0435
+    },
+    {
+      "raw": 0.3,
+      "calibrated": 0.0435
+    },
+    {
+      "raw": 0.4,
+      "calibrated": 0.2462
+    },
+    {
+      "raw": 0.5,
+      "calibrated": 0.2462
+    },
+    {
+      "raw": 0.6,
+      "calibrated": 0.3421
+    },
+    {
+      "raw": 0.7,
+      "calibrated": 0.5065
+    },
+    {
+      "raw": 0.8,
+      "calibrated": 0.671
+    },
+    {
+      "raw": 0.9,
+      "calibrated": 0.8355
+    },
+    {
+      "raw": 1.0,
+      "calibrated": 1.0
+    }
+  ]
+}
