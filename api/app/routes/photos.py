@@ -300,12 +300,21 @@ def get_photo_thumbnail(
     # Locate photo in database
     photo = db.get(Photo, photo_id)
     if photo:
+        raw_p = Path(photo.path)
         candidates = [
+            raw_p if raw_p.is_absolute() else DATA_DIR.parent / photo.path,
             DATA_DIR.parent / photo.path,
             DATA_DIR / photo.path,
-            PHOTOS_DIR / Path(photo.path).name,
+            PHOTOS_DIR / raw_p.name,
+            PHOTOS_DIR / photo.path,
         ]
         found_img_path = next((p for p in candidates if p.exists() and p.is_file()), None)
+        if not found_img_path:
+            for f in PHOTOS_DIR.rglob(raw_p.name):
+                if f.is_file():
+                    found_img_path = f
+                    break
+
         if found_img_path:
             try:
                 generate_thumbnails(found_img_path, photo_id, output_dir=THUMBS_DIR)
@@ -338,12 +347,20 @@ def get_photo_raw(photo_id: str, db: Session = Depends(get_session)):
     """Retrieve original photo file with fail-safe fallback."""
     photo = db.get(Photo, photo_id)
     if photo:
+        raw_p = Path(photo.path)
         candidates = [
+            raw_p if raw_p.is_absolute() else DATA_DIR.parent / photo.path,
             DATA_DIR.parent / photo.path,
             DATA_DIR / photo.path,
-            PHOTOS_DIR / Path(photo.path).name,
+            PHOTOS_DIR / raw_p.name,
+            PHOTOS_DIR / photo.path,
         ]
         found_img_path = next((p for p in candidates if p.exists() and p.is_file()), None)
+        if not found_img_path:
+            for f in PHOTOS_DIR.rglob(raw_p.name):
+                if f.is_file():
+                    found_img_path = f
+                    break
         if found_img_path:
             return FileResponse(found_img_path)
 
