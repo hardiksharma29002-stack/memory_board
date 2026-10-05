@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design Tokens from pdesign.md Section 3.1 & 7 */
+:root {
+  /* Light Theme (Default: warm neutral base + Google blue) */
+  --bg-canvas: #FAF9F7;
+  --bg-surface: #FFFFFF;
+  --bg-surface-muted: #F3F2F0;
+  --bg-surface-elevated: #FFFFFF;
+  --text-primary: #202124;
+  --text-secondary: #5F6368;
+  --text-tertiary: #80868B;
+  --border-subtle: #E6E3DE;
+  
+  --primary: #1A73E8;
+  --primary-soft: #E8F0FE;
+  
+  --success: #188038;
+  --success-soft: #E6F4EA;
+  
+  --warning: #B06000;
+  --warning-soft: #FEF3E7;
+  
+  --shadow-1: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+.dark {
+  /* Dark Theme tokens from pdesign.md Section 3.1 */
+  --bg-canvas: #121212;
+  --bg-surface: #1E1E1E;
+  --bg-surface-muted: #252525;
+  --bg-surface-elevated: #282828;
+  --text-primary: #F1F3F4;
+  --text-secondary: #BDC1C6;
+  --text-tertiary: #9AA0A6;
+  --border-subtle: #3C4043;
+  
+  --primary: #8AB4F8;
+  --primary-soft: #203A5F;
+  
+  --success: #81C995;
+  --success-soft: #1F3A27;
+  
+  --warning: #F6AD55;
+  --warning-soft: #3B2D1A;
+  
+  --shadow-1: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.50);
+}
+
+body {
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+  font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Product Sans", "Inter", Roboto, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Restrained transitions per pdesign.md Section 25 */
+.trans-subtle {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 134, 139, 0.3);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 134, 139, 0.5);
+}
+
