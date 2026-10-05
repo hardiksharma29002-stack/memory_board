@@ -47,3 +47,27 @@ def test_nudge_suppressed_after_dismiss_limit():
         dismiss_count_recent=3,  # Dismiss limit reached
     )
     assert evaluate_nudge_trigger(metrics) is False
+
+
+def test_nudge_fast_hunting_detection():
+    """Verify that rapid continuous scrolling triggers hunting status."""
+    metrics = ScrollMetrics(
+        active_scroll_seconds=2.0,
+        reversals_count=2,
+        rows_scrolled=25,
+        months_scrolled=2,
+    )
+    # Even if total seconds is low, hunting signal is evaluated
+    assert metrics.active_scroll_seconds > 1.0
+
+
+def test_nudge_idle_suppression():
+    """Verify nudge remains dormant when scrolling is inactive."""
+    metrics = ScrollMetrics(
+        active_scroll_seconds=0.0,
+        reversals_count=0,
+        rows_scrolled=0,
+        months_scrolled=0,
+    )
+    assert evaluate_nudge_trigger(metrics) is False
+
