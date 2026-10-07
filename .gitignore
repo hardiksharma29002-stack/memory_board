@@ -1,9 +1,5 @@
-# Data & SQLite & Embeddings
-data/photos/
-data/thumbs/
+# Duplicate backups
 data/sample_backup/
-*.npy
-!data/app.db
 
 # Survey & PDF Research Files (User requirement: no survey or research PDFs)
 *.pdf

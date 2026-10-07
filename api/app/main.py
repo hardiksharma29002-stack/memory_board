@@ -49,6 +49,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+def root_index():
+    """Root endpoint for Render/cloud liveness check and service info."""
+    return {
+        "service": "Memory Board API",
+        "status": "online",
+        "health": "/api/health",
+        "docs": "/docs",
+    }
+
 from fastapi.responses import FileResponse, Response
 from .routes.photos import get_photo_thumbnail, generate_svg_placeholder
 

@@ -40,20 +40,15 @@ export default function SafePhotoThumbnail({
     const pid = photoId || extractPhotoId(currentSrc);
 
     if (stage === 'primary') {
-      // Step 2: Try direct Uvicorn IPv4 port
+      // Step 2: Try dynamic API thumbnail generator endpoint
       setStage('direct');
-      if (src.startsWith('/')) {
-        setCurrentSrc(`http://127.0.0.1:8000${src}`);
-      } else {
-        setStage('api');
-        setCurrentSrc(`/api/photos/${pid}/thumb?size=256`);
-      }
-    } else if (stage === 'direct') {
-      // Step 3: Try API on-the-fly thumb generator
-      setStage('api');
       setCurrentSrc(`/api/photos/${pid}/thumb?size=256`);
+    } else if (stage === 'direct') {
+      // Step 3: Try alternate 1024px thumbnail file
+      setStage('api');
+      setCurrentSrc(`/thumbs/${pid}_1024.webp`);
     } else if (stage === 'api') {
-      // Step 4: Try raw photo stream
+      // Step 4: Try raw photo stream endpoint
       setStage('raw');
       setCurrentSrc(`/api/photos/${pid}/raw`);
     } else {

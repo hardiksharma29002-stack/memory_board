@@ -300,17 +300,19 @@ def get_photo_thumbnail(
     # Locate photo in database
     photo = db.get(Photo, photo_id)
     if photo:
-        raw_p = Path(photo.path)
+        clean_path_str = photo.path.replace("\\", "/")
+        raw_p = Path(clean_path_str)
+        fname = clean_path_str.split("/")[-1]
         candidates = [
-            raw_p if raw_p.is_absolute() else DATA_DIR.parent / photo.path,
-            DATA_DIR.parent / photo.path,
-            DATA_DIR / photo.path,
-            PHOTOS_DIR / raw_p.name,
-            PHOTOS_DIR / photo.path,
+            raw_p if raw_p.is_absolute() else DATA_DIR.parent / clean_path_str,
+            DATA_DIR.parent / clean_path_str,
+            DATA_DIR / clean_path_str,
+            PHOTOS_DIR / fname,
+            PHOTOS_DIR / clean_path_str,
         ]
         found_img_path = next((p for p in candidates if p.exists() and p.is_file()), None)
         if not found_img_path:
-            for f in PHOTOS_DIR.rglob(raw_p.name):
+            for f in PHOTOS_DIR.rglob(fname):
                 if f.is_file():
                     found_img_path = f
                     break
@@ -347,17 +349,19 @@ def get_photo_raw(photo_id: str, db: Session = Depends(get_session)):
     """Retrieve original photo file with fail-safe fallback."""
     photo = db.get(Photo, photo_id)
     if photo:
-        raw_p = Path(photo.path)
+        clean_path_str = photo.path.replace("\\", "/")
+        raw_p = Path(clean_path_str)
+        fname = clean_path_str.split("/")[-1]
         candidates = [
-            raw_p if raw_p.is_absolute() else DATA_DIR.parent / photo.path,
-            DATA_DIR.parent / photo.path,
-            DATA_DIR / photo.path,
-            PHOTOS_DIR / raw_p.name,
-            PHOTOS_DIR / photo.path,
+            raw_p if raw_p.is_absolute() else DATA_DIR.parent / clean_path_str,
+            DATA_DIR.parent / clean_path_str,
+            DATA_DIR / clean_path_str,
+            PHOTOS_DIR / fname,
+            PHOTOS_DIR / clean_path_str,
         ]
         found_img_path = next((p for p in candidates if p.exists() and p.is_file()), None)
         if not found_img_path:
-            for f in PHOTOS_DIR.rglob(raw_p.name):
+            for f in PHOTOS_DIR.rglob(fname):
                 if f.is_file():
                     found_img_path = f
                     break
