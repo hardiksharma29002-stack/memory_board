@@ -360,7 +360,15 @@ def build_candidate_groups(
             except Exception:
                 query_emb = None
 
-        # Score photos against positive cues, negative cues, and query embedding
+        # Extract query tokens for lexical relevance boost
+        query_tokens = []
+        if query and query.strip():
+            query_tokens = [
+                w for w in re.findall(r'\b[a-zA-Z0-9]{3,}\b', query.lower())
+                if w not in ("with", "some", "photos", "find", "pictures", "about", "from", "that", "there", "show", "look")
+            ]
+
+        # Score photos against positive cues, negative cues, query embedding, and lexical keywords
         photo_scores: List[Tuple[str, float]] = []
         for p in all_photos:
             p_tags = tags_by_photo.get(p.id, {})
@@ -382,13 +390,22 @@ def build_candidate_groups(
                 if p.embedding_idx is not None and 0 <= p.embedding_idx < len(embeddings_matrix):
                     q_score = float(np.dot(embeddings_matrix[p.embedding_idx], query_emb))
 
-            # Combine scores preserving both query context and refined cues
+            # 3. Lexical keyword relevance (boosts filename/scene/subject matches)
+            kw_score = 0.0
+            if query_tokens:
+                clean_p_name = p.path.lower().replace("_", " ").replace("-", " ")
+                matches = sum(1 for token in query_tokens if token in clean_p_name)
+                kw_score = matches / len(query_tokens)
+
+            # Combine scores preserving query context, lexical keywords, and refined cues
             if pos_cues and (query_emb is not None):
-                score = 0.45 * q_score + 0.55 * cue_score
+                score = 0.40 * cue_score + 0.35 * q_score + 0.25 * kw_score
             elif pos_cues:
-                score = cue_score
+                score = 0.65 * cue_score + 0.35 * kw_score
             elif query_emb is not None:
-                score = q_score
+                score = 0.65 * q_score + 0.35 * kw_score
+            elif kw_score > 0:
+                score = 0.85 * kw_score + (p.sharpness or 0.0) * 0.15
             else:
                 score = priors.get(p.id, 0.0) * 0.3 + (p.sharpness or 0.0) * 0.1
 

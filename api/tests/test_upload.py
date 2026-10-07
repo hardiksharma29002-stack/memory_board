@@ -58,3 +58,7 @@ def test_upload_external_photo_and_retrieve():
     thumb_res = client.get(f"/api/photos/{sample_pid}/thumb?size=256")
     assert thumb_res.status_code == 200
 
+    # Clean up uploaded test photo so database & gallery are never polluted
+    del_res = client.delete(f"/api/photos/{sample_pid}")
+    assert del_res.status_code == 200
+
